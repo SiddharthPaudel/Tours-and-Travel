@@ -6,23 +6,26 @@ import {
   Globe, 
   LogOut,
   Settings,
-  ChevronRight,Mail
+  ChevronRight,
+  Mail,
+  X // Added X icon for a close button on mobile
 } from 'lucide-react';
 
-const AdminSidebar = ({ activeTab, setActiveTab }) => {
- const menuItems = [
-  { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
-  { id: 'activities', label: 'Activities', icon: Map },
-  { id: 'destinations', label: 'Destinations', icon: Globe },
-  { id: 'users', label: 'Travelers', icon: Users },
-  { id: 'messages', label: 'Inquiries', icon: Mail }, // New Tab
-];
+const AdminSidebar = ({ activeTab, setActiveTab, setIsSidebarOpen }) => {
+  const menuItems = [
+    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+    { id: 'activities', label: 'Activities', icon: Map },
+    { id: 'destinations', label: 'Destinations', icon: Globe },
+    { id: 'users', label: 'Travelers', icon: Users },
+    { id: 'messages', label: 'Inquiries', icon: Mail },
+  ];
 
   return (
-    <aside className="w-64 bg-[#0f172a] text-slate-400 flex flex-col fixed h-full z-20 border-r border-slate-800/50">
+    /* Removed 'fixed' and 'h-full' here because the Parent wrapper now controls positioning */
+    <aside className="w-64 bg-[#0f172a] text-slate-400 flex flex-col h-screen border-r border-slate-800/50">
       
       {/* 1. BRANDING SECTION */}
-      <div className="h-24 flex items-center px-8">
+      <div className="h-24 flex items-center justify-between px-8">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/20">
             <div className="w-4 h-4 bg-white rounded-sm rotate-45" />
@@ -31,10 +34,18 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
             TOMO<span className="text-emerald-500">.</span>
           </h1>
         </div>
+
+        {/* MOBILE CLOSE BUTTON - Only visible on small screens */}
+        <button 
+          onClick={() => setIsSidebarOpen(false)}
+          className="lg:hidden p-2 text-slate-500 hover:text-white transition-colors"
+        >
+          <X size={20} />
+        </button>
       </div>
 
       {/* 2. NAVIGATION SECTION */}
-      <nav className="flex-grow px-3 mt-4 space-y-1">
+      <nav className="flex-grow px-3 mt-4 space-y-1 overflow-y-auto custom-scrollbar">
         <p className="px-5 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4 opacity-50">
           Management
         </p>
@@ -74,27 +85,16 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
       {/* 3. FOOTER SECTION */}
       <div className="p-4 mt-auto border-t border-slate-800/50">
         <div className="bg-slate-800/30 rounded-2xl p-2 space-y-1">
-          <button className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-bold hover:text-white transition-colors">
+          <button className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-bold hover:text-white transition-colors text-left">
             <Settings size={16} className="text-slate-500" />
             <span>Settings</span>
           </button>
           
-          <button className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-bold text-rose-400/80 hover:text-rose-400 hover:bg-rose-400/5 rounded-lg transition-all">
+          <button className="flex items-center gap-3 w-full px-4 py-2.5 text-xs font-bold text-rose-400/80 hover:text-rose-400 hover:bg-rose-400/5 rounded-lg transition-all text-left">
             <LogOut size={16} />
             <span>Sign Out</span>
           </button>
         </div>
-        
-        {/* APP VERSION / USER INFO */}
-        {/* <div className="mt-4 px-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-700 border border-slate-600 overflow-hidden">
-             <img src="https://ui-avatars.com/api/?name=Admin&background=10b981&color=fff" alt="avatar" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-bold text-white leading-none">Admin User</span>
-            <span className="text-[9px] text-slate-500 font-medium">v2.0.4</span>
-          </div>
-        </div> */}
       </div>
     </aside>
   );

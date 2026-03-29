@@ -7,8 +7,6 @@ import DataTable from '../DataTable';
 const DestinationManager = () => {
   const [type, setType] = useState('domestic');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // 1. ADDED: EDITING STATE
   const [editingItem, setEditingItem] = useState(null);
 
   const [destinations, setDestinations] = useState([
@@ -34,17 +32,16 @@ const DestinationManager = () => {
 
   const ActiveFields = FieldComponents[type];
 
-  // 2. UPDATED: EDIT HANDLER
   const handleEdit = (item) => {
     setEditingItem(item);
-    setType(item.type); // Ensure the correct form fields (domestic/intl) show up
+    setType(item.type);
     setCommonData({
       name: item.name,
       description: item.description,
       budget: item.budget
     });
     setSpecificData(item.details || {});
-    setSelectedImage(item.image); // This will show the existing image in preview
+    setSelectedImage(item.image);
     setIsModalOpen(true);
   };
 
@@ -56,10 +53,8 @@ const DestinationManager = () => {
     setSpecificData({ ...specificData, [e.target.name]: e.target.value });
   };
 
-  // 3. UPDATED: SUBMIT LOGIC (Handles both Add and Update)
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     const destinationData = {
       ...commonData,
       details: specificData,
@@ -71,12 +66,10 @@ const DestinationManager = () => {
     };
 
     if (editingItem) {
-      // UPDATE logic
       setDestinations(destinations.map(dest => 
         dest.id === editingItem.id ? { ...dest, ...destinationData } : dest
       ));
     } else {
-      // CREATE logic
       const newDestination = {
         id: Date.now(),
         ...destinationData,
@@ -84,11 +77,9 @@ const DestinationManager = () => {
       };
       setDestinations([newDestination, ...destinations]);
     }
-    
     closeModal();
   };
 
-  // 4. ADDED: CLEAN CLOSE HANDLER
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
@@ -104,10 +95,10 @@ const DestinationManager = () => {
   };
 
   return (
-    <div className="p-8 font-['Montserrat'] animate-in fade-in duration-500">
+    <div className="p-4 md:p-8 font-['Montserrat'] animate-in fade-in duration-500">
       
-      {/* TYPE SWITCHER */}
-      <div className="flex gap-4 mb-8 bg-slate-100 p-2 rounded-2xl w-fit">
+      {/* 1. TYPE SWITCHER - Responsive width */}
+      <div className="flex gap-2 md:gap-4 mb-8 bg-slate-100 p-1.5 rounded-xl md:rounded-2xl w-full sm:w-fit overflow-x-auto no-scrollbar">
         {['domestic', 'international'].map(t => (
           <button 
             key={t}
@@ -115,7 +106,7 @@ const DestinationManager = () => {
               setType(t); 
               setSpecificData({}); 
             }}
-            className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+            className={`flex-1 sm:flex-none px-4 md:px-8 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
               type === t ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -124,38 +115,45 @@ const DestinationManager = () => {
         ))}
       </div>
 
-      <div className="flex justify-between items-center mb-10">
+      {/* 2. HEADER SECTION - Stacked on mobile */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
         <div>
-          <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-1">Geography Manager</p>
-          <h2 className="text-4xl font-black text-slate-900 tracking-tighter capitalize">
+          <p className="text-[9px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-1">Geography Manager</p>
+          <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter capitalize">
             {type} <span className="text-emerald-500">Destinations</span>
           </h2>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)} 
-          className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-95"
+          className="w-full md:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-95"
         >
           + Add New {type}
         </button>
       </div>
 
-      {/* 5. DATA TABLE WITH EDIT PASSED DOWN */}
-      <DataTable 
-        type="destinations"
-        data={destinations.filter(item => item.type === type)} 
-        onDelete={handleDelete}
-        onEdit={handleEdit} 
-      />
+      {/* 3. DATA TABLE - Overflow handling */}
+      <div className="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <DataTable 
+            type="destinations"
+            data={destinations.filter(item => item.type === type)} 
+            onDelete={handleDelete}
+            onEdit={handleEdit} 
+          />
+        </div>
+      </div>
 
-      {/* MODAL */}
+      {/* 4. MODAL - Drawer on Large, Full screen on Mobile */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-slate-900/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl bg-white h-full rounded-[3rem] p-12 overflow-y-auto animate-in slide-in-from-right duration-500 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center lg:justify-end bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4">
+          <div className="w-full max-w-xl bg-white h-full sm:h-[95vh] lg:h-full rounded-none sm:rounded-[2rem] lg:rounded-l-[3rem] lg:rounded-r-none p-6 md:p-12 overflow-y-auto animate-in slide-in-from-right sm:slide-in-from-bottom lg:slide-in-from-right duration-500 shadow-2xl">
             
-            {/* DYNAMIC TITLE */}
-            <h3 className="text-2xl font-black mb-8 uppercase tracking-tighter">
-              {editingItem ? `Edit ${editingItem.name}` : `New ${type} Spot`}
-            </h3>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter">
+                {editingItem ? `Edit ${editingItem.name}` : `New ${type} Spot`}
+              </h3>
+              <button onClick={closeModal} className="lg:hidden text-slate-400 font-bold text-[10px] uppercase">Close</button>
+            </div>
             
             <form onSubmit={handleSubmit} className="space-y-6">
               <ImageUploadField 
@@ -164,7 +162,7 @@ const DestinationManager = () => {
               />
 
               <div className="space-y-4">
-                <div className="group">
+                <div>
                   <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Destination Name</label>
                   <input 
                     type="text" name="name" value={commonData.name}
